@@ -1,13 +1,6 @@
-/* 
- * DCE05968 - Estruturas de Dados I
- *
- * Interface para uso do modulo Filtros
- */
-
 #ifndef FILTRO_H
 #define FILTRO_H
 
-/* Tipos e protótipos de funções que manipulam imagens */
 #include "Imagem.h"
 
 void escurecerImagem(Imagem *img);

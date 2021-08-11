@@ -1,94 +1,79 @@
-/*
- * DCE05968 - Estruturas de Dados I
- *
- * Funções responsaveis pela alocação/desalocação, leitura, gravação e manipulação de uma Imagem
- */
-
 #include <stdio.h>  
 #include <stdlib.h> 
 #include <math.h>
 
-#include "Imagem.h" /* Tipos e protótipos de funções que manipulam imagens */
+#include "Imagem.h" 
 
-/* Representação de uma imagem colorida */
 struct imagem {
     int largura;   /* número de colunas (largura) da imagem em pixels */
     int altura;    /* número de linhas (altura) da imagem em pixels */
     Pixel **pixel; /* matriz altura x largura de pixels com os níveis RGB */
 };
 
-void * mallocSafe(size_t nbytes);
+void *mallocSafe(size_t nbytes);
 
-/*
- * A função 'alocaImagem' recebe dois inteiros 'largura' e 'altura' e retorna um 
- * ponteiro para uma estrutura (tipo Imagem) que representa uma imagem com 
- * 'altura' linhas e 'largura' colunas ('altura' x 'largura' pixels).
- *
- * Cada pixel da imagem é do tipo Pixel.
- *  
- * Esta função deve utilizar a função mallocSafe.
- */
 Imagem *alocaImagem(int largura, int altura){
-    AVISO(Imagem.c: Ainda nao implementei a funcao 'alocaImagem'); //Retire esssa mensagem ao implementar a fução
     
-    /* Você deve usar a função mallocSafe */
+    Imagem *imgPPM = mallocSafe(sizeof(Imagem));
 
+    imgPPM->altura = altura;
+    imgPPM->largura = largura;
+    imgPPM->pixel = mallocSafe(altura * sizeof(Pixel *));
+    
+    for(int h = 0; h < altura; h++){
+        imgPPM->pixel[h] = mallocSafe(largura * sizeof(Pixel));
+    }    
 
-    return NULL;
+    return imgPPM;
 }
 
-/*
- * A função 'liberaImagem' recebe um ponteiro para uma Imagem e
- * deve fazer a desaloação da memória utilizada pela estrutura.
- * 
- * Cuidado para não tentar desalocar algo que ainda não foi alocado.
- */
 void liberaImagem(Imagem *img){
-    AVISO(Imagem.c: Ainda nao implementei a funcao 'liberaImagem'); //Retire esssa mensagem ao implementar a fução
 
-    /* Lembre-se sempre de verificar se o dado foi alocado antes de fazer a desalocação */
+    if (img == NULL)
+    {
+        return;
+    }
+    
+    if (img->pixel != NULL){
+        for (int h = 0; h < img->altura; h++){
+            free(img->pixel[h]);
+        }
+    }
+    free(img->pixel);
+    free(img);
 }
 
-/*
- * A função 'obtemLargura' recebe um ponteiro para uma Imagem e
- * retorna o valor armazenado no campo 'largura' de img.
- */
-int obtemLargura(Imagem *img){
+int obtemLargura(Imagem *img)
+{
     return img->largura;
 }
 
-/*
- * A função 'obtemAltura' recebe um ponteiro para uma Imagem e
- * retorna o valor armazenado no campo 'altura' de img.
- */
-int obtemAltura(Imagem *img){
+int obtemAltura(Imagem *img)
+{
     return img->altura;
 }
 
-/*
- * A função 'obtemPixel' recebe um ponteiro para uma Imagem e
- * uma posicao [l][c] de um pixel. A função retorna o pixel 
- * da posicao [l][c].
- */
-Pixel obtemPixel(Imagem *img, int l, int c){
+Pixel obtemPixel(Imagem *img, int l, int c)
+{
     return img->pixel[l][c];
 }
 
-/*
- * A função 'copiaImagem' recebe um ponteiro para uma Imagem e
- * e deve rotornar uma cópia de 'origem'. A função deve fazer 
- * uma nova aloção de Imagem de forma que 'origem' e a nova Imagem
- * sejam independentes (cada uma está em uma área de memória), mas
- * ambas contém as mesmas informações (largura, altura e pixels).
- */
-Imagem* copiaImagem(Imagem *origem){
-    AVISO(Imagem.c: Ainda nao implementei a funcao 'copiaImagem'); //Retire esssa mensagem ao implementar a fução
-    /*
-     * Verifique se a imagem de origem foi alocada (origem diferente de NULL).
-    */
+Imagem *copiaImagem(Imagem *origem){
+    
+    if(origem == NULL){
+        printf("A alocação não foi feita");
+        return NULL;
+    }
 
+    Imagem *imagemCopiada = alocaImagem(origem->largura, origem->altura);
+    
+    for(int h = 0; h < imagemCopiada->altura; h++){
+        for (int w = 0; w < imagemCopiada->largura; w++){
+            imagemCopiada->pixel[h][w] = origem->pixel[h][w];
+        }        
+    }
 
-    return NULL;
+    return imagemCopiada;
 }
 /*
  * A função 'recolorePixel' recebe um ponteiro para uma Imagem,
@@ -200,7 +185,6 @@ Imagem *carregaImagem(const char *nomeArquivo){
  * https://www.guru99.com/c-file-input-output.html
  */
 void salvaImagem(Imagem *img, const char *nomeArquivo){
-    AVISO(Imagem.c: Ainda nao implementei a funcao salvaImagem); //Retire esssa mensagem ao implementar a fução
 
     FILE *arquivo;
     int c, rgb_comp_color;
@@ -221,6 +205,13 @@ void salvaImagem(Imagem *img, const char *nomeArquivo){
     //Escreve os dados de cada pixel
 
     /* Agora é com você. Só escrever as cores (RBG) de cada um dos pixels */
+    for (int h = 0; h < img->altura; h++){
+        for (int w = 0; w < img->largura; w++){
+            fprintf(arquivo, "%d\n", img->pixel[h][w].cor[GREEN]);
+            fprintf(arquivo, "%d\n", img->pixel[h][w].cor[BLUE]);
+            fprintf(arquivo, "%d\n", img->pixel[h][w].cor[RED]);
+        }
+    }
 
     fclose(arquivo);
     printf("salvaImagem: A imagem foi salva no arquivo: '%s'\n", nomeArquivo);
